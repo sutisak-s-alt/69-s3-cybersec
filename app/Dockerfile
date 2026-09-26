@@ -1,13 +1,16 @@
-FROM python:3.12-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
-COPY requirements.txt .
+COPY package*.json ./
+COPY yarn.lock ./
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN yarn install
 
-COPY app.py .
+COPY . .
 
-EXPOSE 5000
+ENV NODE_ENV=development
 
-CMD ["python", "app.py"]
+EXPOSE 1337
+
+CMD ["yarn", "develop"]

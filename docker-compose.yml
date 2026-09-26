@@ -1,5 +1,7 @@
-services:
+volumes:
+  postgres_data:
 
+services:
   db:
     image: postgres:16-alpine
     container_name: 69-s3-cybersec-db
@@ -10,7 +12,9 @@ services:
       POSTGRES_DB: ${DATABASE_DB}
     ports:
       - "5432:5432"
-
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      
   admin:
     image: dpage/pgadmin4
     container_name: 69-s3-cybersec-admin
@@ -26,15 +30,21 @@ services:
   app:
     build:
       context: ./app
+    image: prawee/strapi
     container_name: 69-s3-cybersec-app
     restart: unless-stopped
     environment:
+      NODE_ENV: development
+      HOST: 0.0.0.0
+      PORT: 1337
+      DATABASE_CLIENT: postgres
       DATABASE_HOST: db
       DATABASE_PORT: 5432
-      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_NAME: ${DATABASE_DB}
+      DATABASE_USERNAME: ${DATABASE_USER}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-      DATABASE_DB: ${DATABASE_DB}
+      DATABASE_SSL: "false"
     ports:
-      - "5000:5000"
+      - "5000:1337"
     depends_on:
       - db
